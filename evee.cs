@@ -7,14 +7,18 @@ class Program
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public Evee(int x, int y)
+		public int Evolution {get; set;}
+		public int LengthOfLife {get; set;}
+		public string Symbol {get; set;}
+		public int Health {get; set;}
+        public Evee(int x, int y, int evolution, int length, string symbol, int health)
         {
             X = x;
             Y = y;
-            int evolution = random(0, 3);
-            int lengthOfLife = 0;
-            string symbol = "e";
-            int health = 100;
+            Evolution = evolution;
+            LengthOfLife = length;
+            Symbol = symbol;
+            Health = health;
         }
         public virtual void Move(int width, int height)
         {
@@ -22,23 +26,23 @@ class Program
             int dy = random.Next(-1, 2);
             X = (X + dx + width) % width;
             Y = (Y + dy + height) % height;
-            Evee.lengthOfLife += 1;
+            Evee.LengthOfLife += 1;
         }
         public virtual void Evolve()
         {
-            if (Evee.lengthOfLife == 3)
+            if (Evee.LengthOfLife == 3)
             {
-                if (Evee.evolution == 0)
+                if (Evee.Evolution == 0)
                 {
-                    Evee.symbol = "f";
+                    Evee.Symbol = "f";
                 }
-                else if (Evee.evolution == 1)
+                else if (Evee.Evolution == 1)
                 {
-                    Evee.symbol = "j";
+                    Evee.Symbol = "j";
                 }
-                else if (Evee.evolution == 2)
+                else if (Evee.Evolution == 2)
                 {
-                    Evee.symbol = "v";
+                    Evee.Symbol = "v";
                 }
             }
         }
@@ -47,7 +51,7 @@ class Program
     {
         public int Hunger { get; set; }
         public bool Ate { get; set; }
-        public Predator(int x, int y, int evolution, int lengthOfLife, string symbol) : base(x, y, evolution, lengthOfLife, symbol)
+        public Predator(int x, int y, int evolution, int lengthOfLife, string symbol, int health) : base(x, y, evolution, lengthOfLife, symbol, health)
         {
             Hunger = 0;
             Ate = false;
@@ -61,29 +65,29 @@ class Program
             {
                 if (Math.Abs(X - prey.X) <= 1 && Math.Abs(Y - prey.Y) <= 1)
                 {
-                    if (Predator.evolution == 0 && prey.evolution == 1 || Predator.evolution == 1 && prey.evolution == 2 || Predator.evolution == 2 && prey.evolution == 0)
+                    if (Predator.Evolution == 0 && prey.Evolution == 1 || Predator.Evolution == 1 && prey.Evolution == 2 || Predator.Evolution == 2 && prey.Evolution == 0)
                     {
                         Hunger = 0;
-                        prey.health -= 30;
-                        if (Predator.evolution == 2 && Predator.lengthOfLife >= 3)
+                        prey.Health -= 30;
+                        if (Predator.Evolution == 2 && Predator.LengthOfLife >= 3)
                         {
-                            prey.health -= 10;
+                            prey.Health -= 10;
                         }
                         ate = true;
                         Ate = true;
-                        if (prey.evolution == 0 && prey.lengthOfLife >= 3)
+                        if (prey.Evolution == 0 && prey.LengthOfLife >= 3)
                         {
-                            Predator.health -= 10;
+                            Predator.Health -= 10;
                         }
-                        if (prey.evolution == 1 && prey.lengthOfLife >= 3)
+                        if (prey.Evolution == 1 && prey.LengthOfLife >= 3)
                         {
-                            int dodge = random(0, 2);
+                            int dodge = random.Next(0, 2);
                             if (dodge == 1)
                             {
-                                prey.health += 30;
+                                prey.Health += 30;
                             }
                         }
-                        if (prey.health > 0)
+                        if (prey.Health > 0)
                         {
                             Ate = false;
                             remainingPrey.Add(prey);
@@ -130,14 +134,15 @@ class Program
                 }
                 if (canSpawn)
                 {
+					int evo = random.Next(0,3);
                     var newPredatores = new List<Predator>(predatores);
-                    newPredatores.Add(new Predator(newX, newY));
+                    newPredatores.Add(new Predator(newX, newY,evo,0,"e",100));
                     return newPredatores;
                 }
             }
             return predatores;
         }
-        public List<Predator> ChekDeath()
+        public List<Predator> ChekDeath(List<Predator> predatores)
         {
             List<Predator> remainingPredator = new List<Predator>();
             foreach (var p in predatores)
@@ -152,7 +157,7 @@ class Program
     }
     class Prey : Evee
     {
-        public Prey(int x, int y, int evolution, int lengthOfLife, string symbol) : base(x, y, evolution, lengthOfLife, symbol) { }
+        public Prey(int x, int y, int evolution, int lengthOfLife, string symbol, int health) : base(x, y, evolution, lengthOfLife, symbol, health) { }
         public List<Prey> Reproduce(List<Predator> predatores, List<Prey> preys, int width, int height)
         {
             int newX = (X + random.Next(-1, 2) + width) % width;
@@ -176,13 +181,14 @@ class Program
             }
             if (canSpawn)
             {
+				int evo = random.Next(0,3);
                 var newPreys = new List<Prey>(preys);
-                newPreys.Add(new Prey(newX, newY));
+                newPreys.Add(new Prey(newX, newY, evo, 0,"e",100));
                 return newPreys;
             }
             return preys;
         }
-        public List<Prey> Heal()
+        public List<Prey> Heal(List<Prey> preys)
         {
             foreach (var p in preys)
             {
@@ -245,7 +251,8 @@ class Program
             var pos = Tuple.Create(x, y);
             if (!occupied.Contains(pos))
             {
-                predatores.Add(new Predator(x, y));
+				int evo = random.Next(0,3);
+                predatores.Add(new Predator(x, y, evo,0,"e",100));
                 occupied.Add(pos);
             }
         }
@@ -256,7 +263,8 @@ class Program
             var pos = Tuple.Create(x, y);
             if (!occupied.Contains(pos))
             {
-                preys.Add(new Prey(x, y));
+				int evo = random.Next(0,3);
+                preys.Add(new Prey(x, y, evo,0,"e",100));
                 occupied.Add(pos);
             }
         }
@@ -281,7 +289,7 @@ class Program
                 preys = predatores[i].Eat(preys);
                 predatores = predatores[i].Reproduce(predatores, preys, fieldSize, fieldSize);
             }
-            for (int i = 0; i < preys.Count; i++)
+            for (int i = 0; i <= preys.Count; i++)
             {
                 preys[i].heal();
                 preys[i].Move(fieldSize, fieldSize);
@@ -293,5 +301,3 @@ class Program
         Console.WriteLine("end");
     }
 }
-
-//добавить prey.evolution =1 возможность dodge и 2 heal
