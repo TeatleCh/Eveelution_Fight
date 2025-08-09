@@ -267,6 +267,7 @@ class Program
             Console.WriteLine($"step {step}");
             for (int i = 0; i < predatores.Count; i++)
             {
+                predatores[i].ChekDeath();
                 if (predatores[i].evolution == 0 && predatores[i].lengthOfLife >= 3)
                 {
                     preys = predatores[i].Eat(preys);
@@ -282,6 +283,7 @@ class Program
             }
             for (int i = 0; i < preys.Count; i++)
             {
+                preys[i].heal();
                 preys[i].Move(fieldSize, fieldSize);
                 preys[i].Evolve();
                 preys = preys[i].Reproduce(predatores, preys, fieldSize, fieldSize);
