@@ -51,7 +51,7 @@ class Program
         {
             Hunger = 0;
             Ate = false;
-            symbol = symbol.ToUpper;
+            symbol = symbol.ToUpper();
         }
         public List<Prey> Eat(List<Prey> preys)
         {
@@ -137,7 +137,7 @@ class Program
             }
             return predatores;
         }
-        public List<Predator> ChekDeath(List<Predator> predatores)
+        public List<Predator> ChekDeath()
         {
             List<Predator> remainingPredator = new List<Predator>();
             foreach (var p in predatores)
@@ -182,7 +182,7 @@ class Program
             }
             return preys;
         }
-        public List<Prey> Heal(List<Prey> preys)
+        public List<Prey> Heal()
         {
             foreach (var p in preys)
             {
