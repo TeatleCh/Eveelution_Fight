@@ -138,20 +138,17 @@ class Program
         }
         public virtual void Evolve()
         {
-            if (this.LengthOfLife == 3)
+            if (this.Evolution == 0)
             {
-                if (this.Evolution == 0)
-                {
-                    this.Symbol = 'F';
-                }
-                else if (this.Evolution == 1)
-                {
-                    this.Symbol = 'J';
-                }
-                else if (this.Evolution == 2)
-                {
-                    this.Symbol = 'V';
-                }
+                this.Symbol = 'F';
+            }
+            else if (this.Evolution == 1)
+            {
+                this.Symbol = 'J';
+            }
+            else if (this.Evolution == 2)
+            {
+                this.Symbol = 'V';
             }
         }
     }
@@ -190,35 +187,26 @@ class Program
         }
         public List<Prey> Heal(List<Prey> preys)
         {
-            foreach (var p in preys)
+            p.Health += 10;
+            if (p.Health > 100)
             {
-                if (p.Evolution == 2 && p.LengthOfLife >= 3)
-                {
-                    p.Health += 10;
-                    if (p.Health > 100)
-                    {
-                        p.Health = 100;
-                    }
-                }
+                p.Health = 100;
             }
             return preys;
         }
         public virtual void Evolve()
         {
-            if (this.LengthOfLife == 3)
+            if (this.Evolution == 0)
             {
-                if (this.Evolution == 0)
-                {
-                    this.Symbol = 'f';
-                }
-                else if (this.Evolution == 1)
-                {
-                    this.Symbol = 'j';
-                }
-                else if (this.Evolution == 2)
-                {
-                    this.Symbol = 'v';
-                }
+                this.Symbol = 'f';
+            }
+            else if (this.Evolution == 1)
+            {
+                this.Symbol = 'j';
+            }
+            else if (this.Evolution == 2)
+            {
+                this.Symbol = 'v';
             }
         }
     }
@@ -304,7 +292,10 @@ class Program
                     preys = predatores[i].Eat(preys);
                 }
                 predatores[i].Move(fieldSize, fieldSize);
-                predatores[i].Evolve();
+                if (predatores[i].LengthOfLife >= 3)
+                {
+                    predatores[i].Evolve();
+                }
                 if (predatores[i].Evolution == 1 && predatores[i].LengthOfLife >= 3)
                 {
                     predatores[i].Move(fieldSize, fieldSize);
@@ -314,9 +305,15 @@ class Program
             }
             for (int i = 0; i < preys.Count; i++)
             {
-                preys[i].Heal(preys);
+                if (preys.Evolution == 2 && preys.LengthOfLife >= 3 && preys.Health < 100)
+                {
+                    preys[i].Heal(preys);
+                }
                 preys[i].Move(fieldSize, fieldSize);
-                preys[i].Evolve();
+                if (preys[i].LengthOfLife >= 3)
+                {
+                    preys[i].Evolve();
+                }
                 preys = preys[i].Reproduce(predatores, preys, fieldSize, fieldSize);
             }
             PrintField(predatores, preys, fieldSize, fieldSize);
