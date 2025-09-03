@@ -39,9 +39,9 @@ class Program
             Ate = false;
             Symbol = symbol;
         }
-        public List<Prey> Eat(List<Prey> preys)
+        public void Eat(var preys)
         {
-            List<Prey> remainingPrey = new List<Prey>();
+            var remainingPrey;
             bool ate = false;
             foreach (var prey in preys)
             {
@@ -85,13 +85,13 @@ class Program
             }
             if (!ate)
             {
-                Hunger++;
+                Hunger = 1;
                 Ate = false;
                 return preys;
             }
-            return remainingPrey;
+            preys = remainingPrey;
         }
-        public List<Predator> Reproduce(List<Predator> predatores, List<Prey> preys, int width, int height)
+        public void Reproduce(var predatores, var preys, int width, int height)
         {
             if (Ate)
             {
@@ -117,16 +117,13 @@ class Program
                 if (canSpawn)
                 {
                     int evo = random.Next(0, 3);
-                    var newPredatores = new List<Predator>(predatores);
-                    newPredatores.Add(new Predator(newX, newY, evo, 0, 'E', 100));
-                    return newPredatores;
+                    predatores.Add(new Predator(newX, newY, evo, 0, 'E', 100));
                 }
             }
-            return predatores;
         }
-        public List<Predator> CheckDeath(List<Predator> predatores)
+        public void CheckDeath(var predatores)
         {
-            List<Predator> remainingPredator = new List<Predator>();
+            var remainingPredator;
             foreach (var p in predatores)
             {
                 if (p.Health > 0)
@@ -134,7 +131,7 @@ class Program
                     remainingPredator.Add(p);
                 }
             }
-            return remainingPredator;
+            predatores = remainingPredator;
         }
         public virtual void Evolve()
         {
@@ -155,7 +152,7 @@ class Program
     class Prey : Evee
     {
         public Prey(int x, int y, int evolution, int lengthOfLife, char symbol, int health) : base(x, y, evolution, lengthOfLife, symbol, health) { }
-        public List<Prey> Reproduce(List<Predator> predatores, List<Prey> preys, int width, int height)
+        public void Reproduce(var predatores, var preys, int width, int height)
         {
             int newX = (X + random.Next(-1, 2) + width) % width;
             int newY = (Y + random.Next(-1, 2) + height) % height;
@@ -179,20 +176,16 @@ class Program
             if (canSpawn)
             {
                 int evo = random.Next(0, 3);
-                var newPreys = new List<Prey>(preys);
-                newPreys.Add(new Prey(newX, newY, evo, 0, 'e', 100));
-                return newPreys;
+                preys.Add(new Prey(newX, newY, evo, 0, 'e', 100));
             }
-            return preys;
         }
-        public List<Prey> Heal(List<Prey> preys)
+        public void Heal(Prey prey)
         {
-            p.Health += 10;
-            if (p.Health > 100)
+            prey.Health += 10;
+            if (prey.Health > 100)
             {
-                p.Health = 100;
+                prey.Health = 100;
             }
-            return preys;
         }
         public virtual void Evolve()
         {
@@ -252,8 +245,8 @@ class Program
             Console.WriteLine("Input field size higher then 0");
             fieldSize = Convert.ToInt32(Console.ReadLine());
         }
-        var predatores = new List<Predator>();
-        var preys = new List<Prey>();
+        var predatores;
+        var preys;
         var occupied = new HashSet<Tuple<int, int>>();
         while (predatores.Count < numPredatores)
         {
@@ -307,7 +300,7 @@ class Program
             {
                 if (preys.Evolution == 2 && preys.LengthOfLife >= 3 && preys.Health < 100)
                 {
-                    preys[i].Heal(preys);
+                    preys[i].Heal(preys[i]);
                 }
                 preys[i].Move(fieldSize, fieldSize);
                 if (preys[i].LengthOfLife >= 3)
