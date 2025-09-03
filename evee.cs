@@ -39,9 +39,9 @@ class Program
             Ate = false;
             Symbol = symbol;
         }
-        public void Eat(var preys)
+        public void Eat(List<Prey> preys)
         {
-            var remainingPrey;
+            List<Prey> remainingPrey = new List<Prey>();
             bool ate = false;
             foreach (var prey in preys)
             {
@@ -87,11 +87,10 @@ class Program
             {
                 Hunger = 1;
                 Ate = false;
-                return preys;
             }
             preys = remainingPrey;
         }
-        public void Reproduce(var predatores, var preys, int width, int height)
+        public void Reproduce(List<Predator> predatores, List<Prey> preys, int width, int height)
         {
             if (Ate)
             {
@@ -121,9 +120,9 @@ class Program
                 }
             }
         }
-        public void CheckDeath(var predatores)
+        public void CheckDeath(List<Predator> predatores)
         {
-            var remainingPredator;
+            List<Predator> remainingPredator = new List<Predator>();
             foreach (var p in predatores)
             {
                 if (p.Health > 0)
@@ -152,7 +151,7 @@ class Program
     class Prey : Evee
     {
         public Prey(int x, int y, int evolution, int lengthOfLife, char symbol, int health) : base(x, y, evolution, lengthOfLife, symbol, health) { }
-        public void Reproduce(var predatores, var preys, int width, int height)
+        public void Reproduce(List<Predator> predatores, List<Prey> preys, int width, int height)
         {
             int newX = (X + random.Next(-1, 2) + width) % width;
             int newY = (Y + random.Next(-1, 2) + height) % height;
@@ -203,7 +202,7 @@ class Program
             }
         }
     }
-    static void PrintField(var predatores, var preys, int width, int height)
+    static void PrintField(List<Predator> predatores, List<Prey> preys, int width, int height)
     {
         char[,] field = new char[height, width];
         for (int y = 0; y < height; y++)
@@ -245,8 +244,8 @@ class Program
             Console.WriteLine("Input field size higher then 0");
             fieldSize = Convert.ToInt32(Console.ReadLine());
         }
-        var predatores;
-        var preys;
+        List<Predator> predatores = new List<Predator>();
+        List<Prey> preys = new List<Prey>();
         var occupied = new HashSet<Tuple<int, int>>();
         while (predatores.Count < numPredatores)
         {
@@ -279,10 +278,10 @@ class Program
             Console.WriteLine($"step {step}");
             for (int i = 0; i < predatores.Count; i++)
             {
-                predatores=predatores[i].CheckDeath(predatores);
+                predatores[i].CheckDeath(predatores);
                 if (predatores[i].Evolution == 0 && predatores[i].LengthOfLife >= 3)
                 {
-                    preys = predatores[i].Eat(preys);
+                    predatores[i].Eat(preys);
                 }
                 predatores[i].Move(fieldSize, fieldSize);
                 if (predatores[i].LengthOfLife >= 3)
@@ -293,12 +292,15 @@ class Program
                 {
                     predatores[i].Move(fieldSize, fieldSize);
                 }
-                preys = predatores[i].Eat(preys);
-                predatores = predatores[i].Reproduce(predatores, preys, fieldSize, fieldSize);
+                predatores[i].Eat(preys);
+                if (predatores.Count + preys.Count <= ((fieldSize * fieldSize) / 2))
+                {
+                    predatores[i].Reproduce(predatores, preys, fieldSize, fieldSize);
+                }
             }
             for (int i = 0; i < preys.Count; i++)
             {
-                if (preys.Evolution == 2 && preys.LengthOfLife >= 3 && preys.Health < 100)
+                if (preys[i].Evolution == 2 && preys[i].LengthOfLife >= 3 && preys[i].Health < 100)
                 {
                     preys[i].Heal(preys[i]);
                 }
@@ -307,7 +309,10 @@ class Program
                 {
                     preys[i].Evolve();
                 }
-                preys = preys[i].Reproduce(predatores, preys, fieldSize, fieldSize);
+                if (predatores.Count + preys.Count <= ((fieldSize * fieldSize) / 2))
+                {
+                    preys[i].Reproduce(predatores, preys, fieldSize, fieldSize);
+                }
             }
             PrintField(predatores, preys, fieldSize, fieldSize);
         }
