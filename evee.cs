@@ -203,7 +203,7 @@ class Program
             }
         }
     }
-    static void PrintField(List<Predator> predatores, List<Prey> preys, int width, int height)
+    static void PrintField(var predatores, var preys, int width, int height)
     {
         char[,] field = new char[height, width];
         for (int y = 0; y < height; y++)
